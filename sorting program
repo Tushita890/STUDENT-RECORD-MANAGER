@@ -1,0 +1,269 @@
+import java.io.*;
+import java.util.*;
+
+class Student {
+
+    String studentId;
+    String name;
+    int age;
+    String gender;
+    int studentClass;
+
+    int math;
+    int science;
+    int english;
+    int history;
+    int computer;
+
+    double attendance;
+    String extracurricular;
+
+    int total;
+    String grade;
+
+    // Constructor
+    Student(String studentId, String name, int age,
+            String gender, int studentClass,
+            int math, int science, int english,
+            int history, int computer,
+            double attendance,
+            String extracurricular,
+            int total, String grade) {
+
+        this.studentId = studentId;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.studentClass = studentClass;
+
+        this.math = math;
+        this.science = science;
+        this.english = english;
+        this.history = history;
+        this.computer = computer;
+
+        this.attendance = attendance;
+        this.extracurricular = extracurricular;
+
+        this.total = total;
+        this.grade = grade;
+    }
+
+    // Display student
+    void display() {
+
+        System.out.println(
+            studentId + " | " +
+            name + " | Age: " +
+            age + " | Total: " +
+            total + " | Attendance: " +
+            attendance + "% | Grade: " +
+            grade
+        );
+    }
+}
+
+public class StudentSorting {
+
+    // ==========================================
+    // SORT BY TOTAL MARKS
+    // Highest to Lowest
+    // ==========================================
+
+    static void sortByTotal(ArrayList<Student> students) {
+
+        for (int i = 0; i < students.size() - 1; i++) {
+
+            for (int j = 0;
+                 j < students.size() - i - 1;
+                 j++) {
+
+                if (students.get(j).total <
+                    students.get(j + 1).total) {
+
+                    Student temp = students.get(j);
+
+                    students.set(j, students.get(j + 1));
+
+                    students.set(j + 1, temp);
+                }
+            }
+        }
+    }
+
+    // ==========================================
+    // SORT BY NAME
+    // A to Z
+    // ==========================================
+
+    static void sortByName(ArrayList<Student> students) {
+
+        for (int i = 0; i < students.size() - 1; i++) {
+
+            for (int j = 0;
+                 j < students.size() - i - 1;
+                 j++) {
+
+                if (students.get(j).name.compareToIgnoreCase(
+                    students.get(j + 1).name) > 0) {
+
+                    Student temp = students.get(j);
+
+                    students.set(j, students.get(j + 1));
+
+                    students.set(j + 1, temp);
+                }
+            }
+        }
+    }
+
+    // ==========================================
+    // SORT BY AGE
+    // Youngest to Oldest
+    // ==========================================
+
+    static void sortByAge(ArrayList<Student> students) {
+
+        for (int i = 0; i < students.size() - 1; i++) {
+
+            for (int j = 0;
+                 j < students.size() - i - 1;
+                 j++) {
+
+                if (students.get(j).age >
+                    students.get(j + 1).age) {
+
+                    Student temp = students.get(j);
+
+                    students.set(j, students.get(j + 1));
+
+                    students.set(j + 1, temp);
+                }
+            }
+        }
+    }
+
+    // ==========================================
+    // SORT BY ATTENDANCE
+    // Highest to Lowest
+    // ==========================================
+
+    static void sortByAttendance(ArrayList<Student> students) {
+
+        for (int i = 0; i < students.size() - 1; i++) {
+
+            for (int j = 0;
+                 j < students.size() - i - 1;
+                 j++) {
+
+                if (students.get(j).attendance <
+                    students.get(j + 1).attendance) {
+
+                    Student temp = students.get(j);
+
+                    students.set(j, students.get(j + 1));
+
+                    students.set(j + 1, temp);
+                }
+            }
+        }
+    }
+
+    // ==========================================
+    // READ CSV FILE
+    // ==========================================
+
+    static ArrayList<Student> readCSV(String fileName) {
+
+        ArrayList<Student> students = new ArrayList<>();
+
+        try {
+
+            BufferedReader br = new BufferedReader(
+                new FileReader(fileName)
+            );
+
+            // Skip header
+            br.readLine();
+
+            String line;
+
+            while ((line = br.readLine()) != null) {
+
+                String[] data = line.split(",");
+
+                Student student = new Student(
+
+                    data[0],                         // StudentID
+                    data[1],                         // Name
+                    Integer.parseInt(data[2]),       // Age
+                    data[3],                         // Gender
+                    Integer.parseInt(data[4]),       // Class
+
+                    Integer.parseInt(data[5]),       // Math
+                    Integer.parseInt(data[6]),       // Science
+                    Integer.parseInt(data[7]),       // English
+                    Integer.parseInt(data[8]),       // History
+                    Integer.parseInt(data[9]),       // Computer
+
+                    Double.parseDouble(data[10]),    // Attendance
+
+                    data[11],                        // Extracurricular
+
+                    Integer.parseInt(data[12]),      // Total
+                    data[13]                          // Grade
+                );
+
+                students.add(student);
+            }
+
+            br.close();
+
+        } catch (Exception e) {
+
+            System.out.println(
+                "Error while reading CSV: " + e.getMessage()
+            );
+        }
+
+        return students;
+    }
+
+    // ==========================================
+    // MAIN METHOD
+    // ==========================================
+
+    public static void main(String[] args) {
+
+        // Read student records
+        ArrayList<Student> students =
+            readCSV("student_records.csv");
+
+        System.out.println(
+            "Total students loaded: " +
+            students.size()
+        );
+
+        System.out.println("\nFIRST 10 RECORDS BEFORE SORTING:");
+        System.out.println("--------------------------------");
+
+        for (int i = 0; i < Math.min(10, students.size()); i++) {
+
+            students.get(i).display();
+        }
+
+        // SORT BY TOTAL
+        sortByTotal(students);
+
+        System.out.println(
+            "\nTOP 10 STUDENTS AFTER SORTING BY TOTAL:"
+        );
+
+        System.out.println("-----------------------------------------");
+
+        for (int i = 0; i < Math.min(10, students.size()); i++) {
+
+            students.get(i).display();
+        }
+    }
+}
