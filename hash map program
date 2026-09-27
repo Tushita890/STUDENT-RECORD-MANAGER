@@ -1,0 +1,169 @@
+#taking 5 random students from the datasets 
+#StudentID	Name	Age	Gender	Class	Math	Science	English	History	Computer	AttendancePercent	Extracurricular	Total	Grade
+#StudentID	Name	Age	Gender	Class	Math	Science	English	History	Computer	AttendancePercent	Extracurricular	Total	Grade
+// S10000	Brianna Smith	16	Female	12	47	85	67	68	81	61.7	None	348	C
+// S10001	Rebecca Vargas	15	Male	8	40	94	42	66	70	69.78	Drama	312	C
+// S10002	Christopher Taylor	17	Male	7	71	59	30	88	94	71.95	Music	342	C
+// S10003	Jared Riley	11	Female	7	72	78	32	38	92	81.31	Football	312	C
+// S10004	Kevin Huff	14	Female	11	87	79	84	53	77	81.37	None	380	C
+// using the following datasets , use the concept of hashmap and make code in java for student record manager
+import java.util.*;
+
+class StudentRecord {
+    private final String studentId;
+    private String name;
+    private int age;
+    private String gender;
+    private int studentClass;
+    private int math;
+    private int science;
+    private int english;
+    private int history;
+    private int computer;
+    private double attendancePercent;
+    private String extracurricular;
+    private int total;
+    private char grade;
+
+    public StudentRecord(String studentId, String name, int age, String gender, int studentClass,
+                         int math, int science, int english, int history, int computer,
+                         double attendancePercent, String extracurricular, int total, char grade) {
+        this.studentId = studentId;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.studentClass = studentClass;
+        this.math = math;
+        this.science = science;
+        this.english = english;
+        this.history = history;
+        this.computer = computer;
+        this.attendancePercent = attendancePercent;
+        this.extracurricular = extracurricular;
+        this.total = total;
+        this.grade = grade;
+    }
+
+    // Getters
+    public String getStudentId() { return studentId; }
+    public String getName() { return name; }
+    public int getStudentClass() { return studentClass; }
+    public String getExtracurricular() { return extracurricular; }
+    public int getTotal() { return total; }
+    public char getGrade() { return grade; }
+
+    // Setters for mutable fields
+    public void setAttendancePercent(double attendancePercent) {
+        this.attendancePercent = attendancePercent;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%-7s | %-19s | Class: %-2d | Math: %2d, Sci: %2d, Eng: %2d, Hist: %2d, Comp: %2d | Att: %5.2f%% | %-10s | Total: %3d | Grade: %c",
+                studentId, name, studentClass, math, science, english, history, computer,
+                attendancePercent, extracurricular, total, grade);
+    }
+}
+
+public class StudentRecordManager {
+    // Primary index: O(1) retrieval/update/delete by StudentID
+    private final Map primaryIndex = new HashMap<>();
+
+    // Secondary index: O(1) bucket lookup for students by Class
+    private final Map> classIndex = new HashMap<>();
+
+    // Secondary index: O(1) bucket lookup for students by Extracurricular activity
+    private final Map> activityIndex = new HashMap<>();
+
+    // Insert or update a student record
+    public void addStudent(StudentRecord record) {
+        primaryIndex.put(record.getStudentId(), record);
+
+        // Maintain class index
+        classIndex.computeIfAbsent(record.getStudentClass(), k -> new HashSet<>())
+                  .add(record.getStudentId());
+
+        // Maintain extracurricular index
+        activityIndex.computeIfAbsent(record.getExtracurricular(), k -> new HashSet<>())
+                     .add(record.getStudentId());
+    }
+
+    // O(1) search by unique StudentID
+    public StudentRecord getStudentById(String studentId) {
+        return primaryIndex.get(studentId);
+    }
+
+    // Lookup students by class
+    public List getStudentsByClass(int studentClass) {
+        Set ids = classIndex.getOrDefault(studentClass, Collections.emptySet());
+        List results = new ArrayList<>();
+        for (String id : ids) {
+            results.add(primaryIndex.get(id));
+        }
+        return results;
+    }
+
+    // Lookup students by extracurricular activity
+    public List getStudentsByActivity(String activity) {
+        Set ids = activityIndex.getOrDefault(activity, Collections.emptySet());
+        List results = new ArrayList<>();
+        for (String id : ids) {
+            results.add(primaryIndex.get(id));
+        }
+        return results;
+    }
+
+    // O(1) delete student and synchronize secondary indexes
+    public boolean deleteStudent(String studentId) {
+        StudentRecord removed = primaryIndex.remove(studentId);
+        if (removed != null) {
+            Set classGroup = classIndex.get(removed.getStudentClass());
+            if (classGroup != null) {
+                classGroup.remove(studentId);
+            }
+
+            Set activityGroup = activityIndex.get(removed.getExtracurricular());
+            if (activityGroup != null) {
+                activityGroup.remove(studentId);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        StudentRecordManager manager = new StudentRecordManager();
+
+        // Loading dataset records into the manager
+        manager.addStudent(new StudentRecord("S10000", "Brianna Smith", 16, "Female", 12, 47, 85, 67, 68, 81, 61.70, "None", 348, 'C'));
+        manager.addStudent(new StudentRecord("S10001", "Rebecca Vargas", 15, "Male", 8, 40, 94, 42, 66, 70, 69.78, "Drama", 312, 'C'));
+        manager.addStudent(new StudentRecord("S10002", "Christopher Taylor", 17, "Male", 7, 71, 59, 30, 88, 94, 71.95, "Music", 342, 'C'));
+        manager.addStudent(new StudentRecord("S10003", "Jared Riley", 11, "Female", 7, 72, 78, 32, 38, 92, 81.31, "Football", 312, 'C'));
+        manager.addStudent(new StudentRecord("S10004", "Kevin Huff", 14, "Female", 11, 87, 79, 84, 53, 77, 81.37, "None", 380, 'C'));
+
+        // 1. Direct O(1) lookup by primary key
+        System.out.println("--- Lookup Student S10003 ---");
+        StudentRecord s = manager.getStudentById("S10003");
+        System.out.println(s != null ? s : "Not found");
+
+        // 2. Querying by Class (secondary index)
+        System.out.println("\n--- Students in Class 7 ---");
+        List class7Students = manager.getStudentsByClass(7);
+        for (StudentRecord student : class7Students) {
+            System.out.println(student);
+        }
+
+        // 3. Querying by Extracurricular Activity (secondary index)
+        System.out.println("\n--- Students participating in None ---");
+        List noActivityStudents = manager.getStudentsByActivity("None");
+        for (StudentRecord student : noActivityStudents) {
+            System.out.println(student);
+        }
+
+        // 4. Deleting a record and verifying index integrity
+        System.out.println("\n--- Deleting S10002 ---");
+        manager.deleteStudent("S10002");
+        System.out.println("S10002 exists? " + (manager.getStudentById("S10002") != null));
+        System.out.println("Remaining in Class 7: " + manager.getStudentsByClass(7).size());
+    }
+}
