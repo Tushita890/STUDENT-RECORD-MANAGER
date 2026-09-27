@@ -167,3 +167,19 @@ public class StudentRecordManager {
         System.out.println("Remaining in Class 7: " + manager.getStudentsByClass(7).size());
     }
 }
+
+#ouput 
+--- Lookup Student S10003 ---
+S10003  | Jared Riley         | Class: 7  | Math: 72, Sci: 78, Eng: 32, Hist: 38, Comp: 92 | Att: 81.31% | Football   | Total: 312 | Grade: C
+
+--- Students in Class 7 ---
+S10002  | Christopher Taylor | Class: 7  | Math: 71, Sci: 59, Eng: 30, Hist: 88, Comp: 94 | Att: 71.95% | Music      | Total: 342 | Grade: C
+S10003  | Jared Riley         | Class: 7  | Math: 72, Sci: 78, Eng: 32, Hist: 38, Comp: 92 | Att: 81.31% | Football   | Total: 312 | Grade: C
+
+--- Students participating in None ---
+S10000  | Brianna Smith       | Class: 12 | Math: 47, Sci: 85, Eng: 67, Hist: 68, Comp: 81 | Att: 61.70% | None       | Total: 348 | Grade: C
+S10004  | Kevin Huff          | Class: 11 | Math: 87, Sci: 79, Eng: 84, Hist: 53, Comp: 77 | Att: 81.37% | None       | Total: 380 | Grade: C
+
+--- Deleting S10002 ---
+S10002 exists? false
+Remaining in Class 7: 1
