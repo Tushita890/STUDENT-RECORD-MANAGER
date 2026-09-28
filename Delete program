@@ -1,0 +1,98 @@
+Student.java                                public class Student {
+    private String id;
+    private String name;
+    private double gpa;
+    private String major;
+
+    public Student(String id, String name, double gpa, String major) {
+        this.id = id;
+        this.name = name;
+        this.gpa = gpa;
+        this.major = major;
+    }
+
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public double getGpa() { return gpa; }
+    public String getMajor() { return major; }
+
+    @Override
+    public String toString() {
+        return "Student{ID='" + id + "', Name='" + name + "', GPA=" + gpa + ", Major='" + major + "'}";
+    }
+}
+
+
+
+
+DeleteRecordExample.java import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
+
+import java.util.List;public class DeleteRecordExample {
+
+
+
+    private static final String FILE_PATH = "student_records.csv";
+
+    public static void main(String[] args) {
+        List<Student> students = readCSV(FILE_PATH);
+        System.out.println("Initial Record Count: " + students.size());
+        //Deleting a student record with 102 id
+        String idToDelete = "102";
+        boolean removed = students.removeIf(student -> student.getId().equals(idToDelete));
+
+        if (removed) {
+            System.out.println("Student with ID " + idToDelete + " removed successfully.");
+            writeCSV(FILE_PATH, students);
+            System.out.println("Updated CSV saved successfully. New Record Count: " + students.size());
+        } else {
+            System.out.println("Student with ID " + idToDelete + " not found.");
+        }
+    }
+
+    private static List<Student> readCSV(String filePath) {
+        List<Student> list = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            boolean isHeader = true;
+
+            while ((line = br.readLine()) != null) {
+                if (isHeader) {
+                    isHeader = false;
+                    continue; // Skip header line
+                }
+                String[] values = line.split(",");
+                if (values.length >= 4) {
+                    list.add(new Student(values[0].trim(), values[1].trim(), 
+                    Double.parseDouble(values[2].trim()), values[3].trim()));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        }
+        return list;
+    }
+
+    private static void writeCSV(String filePath, List<Student> list) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            // Write Header
+            bw.write("ID,Name,GPA,Major");
+            bw.newLine();
+
+            // Write Student Rows
+            for (Student s : list) {
+                String row = String.format("%s,%s,%.2f,%s", 
+                        s.getId(), s.getName(), s.getGpa(), s.getMajor());
+                bw.write(row);
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+    }
+}
